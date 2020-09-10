@@ -1,0 +1,21 @@
+{
+  "name": "mcservermanager",
+  "version": "1.0.0",
+  "description": "Minecraft Server Mangement App",
+  "main": "app.js",
+  "scripts": {
+    "test": "electron .",
+    "build": "cd ../ && electron-packager source/ result --platform win32"
+  },
+  "author": "Dunemask",
+  "license": "GPL2.1",
+  "devDependencies": {
+    "electron": "^10.1.1"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "open-file-explorer": "^1.0.2",
+    "shelljs": "^0.8.4",
+    "tree-kill": "^1.2.2"
+  }
+}

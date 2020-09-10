@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Minecraft Server Console</title>
+    <link rel="stylesheet" href="index.css"/>
+  </head>
+  <body>
+    <div class="sidenav-wrapper">
+              <div class="sidenav">
+                <div class="link-wrapper">
+                  <h2>Navigation</h2>
+                  <ul>
+                    <li><a id="overviewPage">Overview</a></li>
+                    <li><a id="createPage">Create Server</a></li>
+                    <li><a id="globalSettingsPage">Settings</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+    <div class="content">
+      <div class="overview">
+        <h3 id="ramUsage">Ram ${0}/${1} </h3>
+        <h2 id="overviewTitle">Console Management</h2>
+        <div id='overviewConsole'>
+          <div id="liveServers">
+          </div>
+          <div id="databaseServers">
+          </div>
+        </div>
+      </div>
+      <div class="create">
+      </div>
+      <div class="globalSettings">
+      </div>
+    </div>
+    <script src="renderer.js"></script>
+  </body>
+</html>
