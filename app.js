@@ -8,7 +8,8 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
-    icon: __dirname + '/creeper.png'
+    icon: __dirname + '/creeper.png',
+    session:true
   })
 
   // and load the index.html of the app.

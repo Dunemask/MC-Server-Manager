@@ -1,3 +1,22 @@
 html{
   background-color: white;
 }
+
+ul{
+    list-style:none;
+    padding:0px;
+}
+
+#databaseServers > ul{
+  background-color: gray;
+  padding:20px;
+  list-style: none;
+}
+
+#databaseServers > li{
+  background-color: gray;
+}
+
+.databaseServer > h2{
+  background-color: white;
+}

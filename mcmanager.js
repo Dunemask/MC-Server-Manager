@@ -8,13 +8,11 @@ const serverLocation = 'server-manager/servers/';
 const pluginsLocation = 'server-manager/plugins/';
 const jarsLocation = 'server-manager/jars/';
 const openExplorer = require('open-file-explorer');
-global.serverInstances=[];
 //Setup DB
 global.db = readDB();
 function readDB(){
   return JSON.parse(fs.readFileSync(dbLocation));
 }
-global.ramInUse = 0;
 function updateDB(){
   let data=JSON.stringify(db,null,1);
   fs.writeFileSync(dbLocation, data);
@@ -28,7 +26,7 @@ function updatePluginsList(){
 return pluginsList;
 }
 function removeRunningInstance(name){
-  for(i in global.serverInstances){
+  for(let i in global.serverInstances){
     if(global.serverInstances[i].server.name==name){
       global.serverInstances.splice(i, 1);
     }
@@ -89,6 +87,20 @@ function stopWorld(name){
   return false;
 
 }
+
+function openWorld(server){
+  if(fs.existsSync(serverLocation+server.name)){
+    openExplorer(serverLocation+server.namename, err => {
+      if(err) {
+          console.log(err);
+      }
+      else {
+          console.log('Gucci?');
+      }
+  });
+  }
+}
+
 function updateServer(server){
   for(s in global.db.servers){
     if(global.db.servers[s].name==server.name){
@@ -144,7 +156,7 @@ function startWorld(name){
   if(!fs.existsSync(`${serverDir}${server.jar}`)){
     fs.copyFileSync(`${jarsLocation}${server.jar}`, `${serverDir}${server.jar}`,fs.constants.COPYFILE_EXCL);
   }
-  let command=`/usr/bin/java -Xmx${server.ram}M -Xms${server.ram}M -jar ${server.jar} nogui`;
+  let command=`${db.javaPath} -Xmx${server.ram}M -Xms${server.ram}M -jar ${server.jar} nogui`;
   let cp=child_process.exec(command,{cwd:`${serverDir}`,detached: true});
 /*  cp.stdout.on('data', (data) => {
   console.log(`child stdout:\n${data}`);
@@ -182,4 +194,5 @@ exports.createWorld = createWorld;
 exports.deleteWorld = deleteWorld;
 exports.stopWorld=stopWorld;
 exports.startWorld=startWorld;
+exports.openWorld=openWorld;
 exports.removeRunningInstance=removeRunningInstance;

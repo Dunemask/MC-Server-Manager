@@ -11,9 +11,9 @@
                 <div class="link-wrapper">
                   <h2>Navigation</h2>
                   <ul>
-                    <li><a id="overviewPage">Overview</a></li>
-                    <li><a id="createPage">Create Server</a></li>
-                    <li><a id="globalSettingsPage">Settings</a></li>
+                    <li><a id="overviewLink" onclick="loadContent('overview')">Overview</a></li>
+                    <li><a id="createLink" onclick="loadContent('createPage')">Create Server</a></li>
+                    <li><a id="globalSettingsLink">Settings</a></li>
                   </ul>
                 </div>
               </div>
@@ -22,16 +22,16 @@
       <div class="overview">
         <h3 id="ramUsage">Ram ${0}/${1} </h3>
         <h2 id="overviewTitle">Console Management</h2>
+      </div>
         <div id='overviewConsole'>
           <div id="liveServers">
           </div>
           <div id="databaseServers">
           </div>
         </div>
+      <div id="create">
       </div>
-      <div class="create">
-      </div>
-      <div class="globalSettings">
+      <div id="globalSettings">
       </div>
     </div>
     <script src="renderer.js"></script>

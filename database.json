@@ -2,5 +2,25 @@
  "username": "admin",
  "password": "password",
  "ramCapacity": "8192",
- "servers": []
+ "defaultRamAllocation": "2048",
+ "javaPath": "/usr/bin/java",
+ "serverInstances": [],
+ "ramInUse": 0,
+ "servers": [
+  {
+   "name": "Survival",
+   "ram": "2048",
+   "jar": "Vanilla-1.15.2.jar",
+   "plugins": []
+  },
+  {
+   "name": "Creative",
+   "ram": "2048",
+   "jar": "Vanilla-1.15.2.jar",
+   "plugins": [
+    "DeathSwap.jar",
+    "Manhunt.jar"
+   ]
+  }
+ ]
 }
