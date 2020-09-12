@@ -8,6 +8,7 @@
     "build": "electron-builder --dir",
     "pack": "electron-packager . 'mcservermanager' --out dist/ --overwrite --icon=./icons/icon32.png",
     "deb64": "electron-installer-debian --src dist/mcservermanager-linux-x64/ --arch amd64 --config deb-package-config.json"
+    ,"dist":"npm run pack && npm run deb64"
   },
   "author": "Dunemask",
   "license": "GPL2.1",
