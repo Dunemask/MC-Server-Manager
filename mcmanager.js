@@ -208,7 +208,9 @@ function initializeBackend(){
                    "ramCapacity": "8192",
                    "defaultRamAllocation": "2048",
                    "javaPath": "java",
-                   "servers": []
+                   "servers": [],
+                   "serverInstances": [],
+                   "ramInUse": 0
                  },null,1))
   }
   if(!fs.existsSync(management)){
