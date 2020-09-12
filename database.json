@@ -4,24 +4,5 @@
  "ramCapacity": "8192",
  "defaultRamAllocation": "2048",
  "javaPath": "/usr/bin/java",
- "serverInstances": [],
- "ramInUse": 0,
- "servers": [
-  {
-   "name": "Survival",
-   "ram": "2048",
-   "jar": "Vanilla-1.15.2.jar",
-   "plugins": []
-  },
-  {
-   "name": "Survival2",
-   "ram": "2048",
-   "jar": "Vanilla-1.15.2.jar",
-   "plugins": [
-    "BedrockLook.jar",
-    "DeathSwap.jar",
-    "Manhunt.jar"
-   ]
-  }
- ]
+ "servers": []
 }

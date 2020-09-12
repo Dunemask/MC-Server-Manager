@@ -61,7 +61,7 @@ let pluginsSelector = function(server){
  return modSelector;
 }
 //Reset content
-function loadContent(content){
+function loadContent(content,forceReload){
   overviewConsole.style.display="none";
   createPage.style.display="none";
   globalSettings.style.display="none";
@@ -69,7 +69,7 @@ function loadContent(content){
   dynamicUpdate(ramUsageHeader,{0:global.ramInUse,1:global.db.ramCapacity});
   //overviewConsole content;
   if(content=='overview'){
-    loadOverview();
+    loadOverview(forceReload);
     addListeners();
     overviewConsole.style.display="block";
   }else if(content=="createPage"){
@@ -105,7 +105,7 @@ function loadOverviewServer(server,openSettings){
   serverContent+= '</li></div>'
   return serverContent;
 }
-function loadOverview(){
+function loadOverview(forceReload){
   //Running Instance Render
   if(global.serverInstances.length==0){
     liveServers.innerHTML='<h3>No Servers Running</h3>'
@@ -126,7 +126,7 @@ function loadOverview(){
   //Database Server Render
   if(global.db.servers.length==0){
     databaseServers.innerHTML='<h3>No Servers Found '+createLink.innerHTML+'</h3>';
-  }else if(discardButtons.length==0){
+  }else if(discardButtons.length==0||forceReload){
     //Create local copy of servers we can adjust
     let servers = []
     for(let s in global.db.servers){
@@ -160,7 +160,12 @@ function startWorld(name){
 function deleteWorld(name){
   mgr.deleteWorld(name);
   mgr.updateDatabase();
-  loadContent('overview');
+  let headers = document.querySelectorAll('.databaseServer > h2');
+  for(let h in headers){
+    if(headers[h] instanceof Element && headers[h].innerHTML==name){
+      headers[h].closest('.databaseServer').parentElement.remove();
+    }
+  }
 }
 function loadCreate(){
   let defaultName = 'Survival';
@@ -211,16 +216,16 @@ function buildWorld(){
   }
   mgr.createWorld(name,ram,jar,plugins);
   mgr.updateDatabase();
-  loadContent('overview');
+  loadContent('overview',true);
 }
 function addListeners(){
   let settingsTriggerButtons = document.getElementsByClassName('serverSettingsTrigger');
   for(let b in settingsTriggerButtons){
-    if(settingsTriggerButtons[b].children){
-      settingsTriggerButtons[b].addEventListener('click',function(){
+    if(settingsTriggerButtons[b] instanceof Element){
+      settingsTriggerButtons[b].onclick = function(){
         let hiddenSettings=settingsTriggerButtons[b].closest('.databaseServer').getElementsByClassName('serverSettings')[0]
         hiddenSettings.style.display= hiddenSettings.style.display=='block'?'none':'block';
-      })
+      }
     }
   }
   let settingsPanels = document.getElementsByClassName('serverSettings');
@@ -264,7 +269,8 @@ function addListeners(){
             settingsDiscardButton.disabled = settingsDiscardButton.disabled?`${this.checked}`==this.defaultValue:false;
           })
         }
-    settingsDiscardButton.addEventListener('click',function(){
+
+    settingsDiscardButton.onclick=function(){
       let name =  settingsPanels[s].parentElement.querySelector('h2').innerHTML;
       this.disabled=true;
       this.parentElement.querySelector('.saveServerChanges').disabled=true;
@@ -272,14 +278,14 @@ function addListeners(){
       for(let s in global.db.servers){
         if(global.db.servers[s].name==name){
           this.closest('.databaseServer').parentElement.innerHTML=loadOverviewServer(global.db.servers[s],true);
-          console.log(loadOverviewServer(global.db.servers[s]));
           break;
         }
       }
-      loadContent('overview');
 
-    })
-    settingsSaveButton.addEventListener('click',function(){
+      loadContent('overview');
+    }
+
+    settingsSaveButton.onclick = function(){
       let name =  settingsPanels[s].parentElement.querySelector('h2').innerHTML;
       let ramInput = settingsPanels[s].querySelector('input[name=ramSelector]');
       let jarSelector = settingsPanels[s].querySelector('select');
@@ -302,17 +308,9 @@ function addListeners(){
         this.disabled=true;
         this.parentElement.querySelector('.discardServerChanges').disabled=true;
         loadContent('overview');
-        let settingsTriggerButtons = document.getElementsByClassName('serverSettingsTrigger');
-        for(let b in settingsTriggerButtons){
-          if(settingsTriggerButtons[b].children){
-            settingsTriggerButtons[b].addEventListener('click',function(){
-              let hiddenSettings=settingsTriggerButtons[b].closest('.databaseServer').getElementsByClassName('serverSettings')[0]
-              hiddenSettings.style.display= hiddenSettings.style.display=='block'?'none':'block';
-            })
-          }
-        }
       }
-    })
+    }
+
     }
   }
 
@@ -322,9 +320,6 @@ window.onbeforeunload = function(event){
   sessionStorage.setItem("serverInstances", JSON.stringify(global.serverInstances,null,1));
   sessionStorage.setItem('ramInUse',ramInUse);
 }
-
-loadOverview();
-loadCreate();
 loadContent('overview')
 //Load Global Elements and assign event listeners
 const createWorldButton = document.getElementById('createWorldButton');
