@@ -1,22 +1,21 @@
 {
   "name": "mcservermanager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Minecraft Server Mangement App",
   "main": "app.js",
   "scripts": {
     "test": "electron .",
-    "build": "cd ../ && electron-packager source/ result --platform win32"
+    "build": "electron-packager . 'mcservermanager' --platform linux --arch x64 --out dist/ --overwrite --icon=icon.png",
+    "deb64": "electron-installer-debian --src 'dist/mcservermanager-linux-x64/' --dest dist/installers/ --arch amd64"
   },
   "author": "Dunemask",
   "license": "GPL2.1",
   "devDependencies": {
-    "electron": "^10.1.1"
+    "electron": "^10.1.1",
+    "electron-installer-debian": "^3.1.0"
   },
   "dependencies": {
     "child_process": "^1.0.2",
-    "electron-store": "^6.0.0",
-    "open-file-explorer": "^1.0.2",
-    "shelljs": "^0.8.4",
     "tree-kill": "^1.2.2"
   }
 }

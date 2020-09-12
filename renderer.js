@@ -25,6 +25,7 @@ let ramOption = function(server){
   return `<input type="text" name="ramSelector" value="${ramValue}"></input>`
 }
 let jarSelector = function(server){
+  jarList=mgr.updateJarList();
   let versionSelector = `<select name="minecraftVersion" id="minecraftVersionSelector"`;
   if(server){
     versionSelector+= `selected="${server.version}"`
@@ -216,6 +217,11 @@ function buildWorld(){
     loadContent('createPage');
     return;
   }
+  if(document.getElementById('minecraftVersionSelector').options.length==0){
+    alert('You must download a jar and put it into the jars folder');
+    return;
+  }
+
   let jar = document.getElementById('minecraftVersionSelector').options[document.getElementById('minecraftVersionSelector').selectedIndex].text;
   let ram = createPage.querySelector('input[name=ramSelector]').value
   let pluginSelectorList = createPage.querySelector('ul').children;
@@ -272,13 +278,15 @@ function addListeners(){
       for(let p in pluginsSelector){
         if(pluginsSelector[p].children)
           plugin = pluginsSelector[p].querySelector('input[type="checkbox"]');
-          plugin.defaultValue=plugin.checked;
-          plugin.addEventListener('change',function(){
-            settingsSaveButton = settingsPanels[s].querySelector('.saveServerChanges');
-            settingsDiscardButton = settingsPanels[s].querySelector('.discardServerChanges');
-            settingsSaveButton.disabled = settingsDiscardButton.disabled? `${this.checked}`==this.defaultValue:false;
-            settingsDiscardButton.disabled = settingsDiscardButton.disabled?`${this.checked}`==this.defaultValue:false;
-          })
+          if(plugin){
+            plugin.defaultValue=plugin.checked;
+            plugin.addEventListener('change',function(){
+              settingsSaveButton = settingsPanels[s].querySelector('.saveServerChanges');
+              settingsDiscardButton = settingsPanels[s].querySelector('.discardServerChanges');
+              settingsSaveButton.disabled = settingsDiscardButton.disabled? `${this.checked}`==this.defaultValue:false;
+              settingsDiscardButton.disabled = settingsDiscardButton.disabled?`${this.checked}`==this.defaultValue:false;
+            })
+          }
         }
 
     settingsDiscardButton.onclick=function(){

@@ -10,6 +10,9 @@ body{
   margin:0px;
 }
 
+#openSystemFolder:hover{
+  cursor: pointer
+}
 ul{
     list-style:none;
     padding:0px;

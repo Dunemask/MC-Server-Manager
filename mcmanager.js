@@ -1,13 +1,17 @@
+const {shell} = require('electron')
 const fs = require('fs');
-const shell = require('shelljs');
 const child_process = require('child_process');
 const tk = require('tree-kill');
+const homedir = require('os').homedir();
+const path = require('path');
 //Define Constants
-const dbLocation = 'database.json';
-const serverLocation = 'server-manager/servers/';
-const pluginsLocation = 'server-manager/plugins/';
-const jarsLocation = 'server-manager/jars/';
-const openExplorer = require('open-file-explorer');
+const resourcesLocation = path.join(homedir+'/mcservermanager/');
+const management = resourcesLocation+'server-manager/';
+const dbLocation = resourcesLocation+'database.json';
+const serverLocation = management+'servers/';
+const pluginsLocation = management+'plugins/';
+const jarsLocation = management+'jars/';
+initializeBackend();
 //Setup DB
 global.db = readDB();
 function readDB(){
@@ -88,16 +92,19 @@ function stopWorld(name){
 
 }
 
-function openWorld(server){
-  if(fs.existsSync(serverLocation+server.name)){
-    openExplorer(serverLocation+server.namename, err => {
-      if(err) {
-          console.log(err);
-      }
-      else {
-          console.log('Gucci?');
-      }
-  });
+function openSettings(){
+  shell.openPath(dbLocation);
+}
+
+function openSystemFolder(){
+  shell.openPath(resourcesLocation);
+}
+
+function openWorld(serverName){
+  console.log(serverLocation+serverName);
+  if(fs.existsSync(serverLocation+serverName)){
+    shell.openPath(serverLocation+serverName);
+  }else{
   }
 }
 
@@ -129,10 +136,10 @@ function startWorld(name){
   if(!fs.existsSync(serverDir)){
     fs.mkdirSync(serverDir);
     if(!fs.existsSync(`${serverDir}eula.txt`)){
-      fs.copyFileSync(`server-manager/default_eula.txt`, `${serverDir}eula.txt`,fs.constants.COPYFILE_EXCL);
+      fs.copyFileSync(resourcesLocation+`default_eula.txt`, `${serverDir}eula.txt`,fs.constants.COPYFILE_EXCL);
     }
     if(!fs.existsSync(`${serverDir}ops.json`)){
-      fs.copyFileSync(`server-manager/default_ops.json`, `${serverDir}ops.json`,fs.constants.COPYFILE_EXCL);
+      fs.copyFileSync(resourcesLocation+`default_ops.json`, `${serverDir}ops.json`,fs.constants.COPYFILE_EXCL);
     }
     fs.copyFileSync(`${jarsLocation}${server.jar}`, `${serverDir}${server.jar}`,fs.constants.COPYFILE_EXCL);
   }
@@ -174,8 +181,22 @@ cp.addListener('close', (evt) =>{
   return 'started';
 }
 function initializeBackend(){
-  if(!fs.existsSync('server-manager/')){
-    fs.mkdirSync('server-manager/');}
+  if(!fs.existsSync(resourcesLocation)){
+    fs.mkdirSync(resourcesLocation);
+    fs.writeFileSync(resourcesLocation+`default_ops.json`, '[]');
+    fs.writeFileSync(resourcesLocation+`default_eula.txt`, 'eula=true');
+    fs.writeFileSync(dbLocation,JSON.stringify({
+                   "username": "admin",
+                   "password": "password",
+                   "ramCapacity": "8192",
+                   "defaultRamAllocation": "2048",
+                   "javaPath": "java",
+                   "servers": []
+                 },null,1))
+  }
+  if(!fs.existsSync(management)){
+    fs.mkdirSync(management);
+  }
   if(!fs.existsSync(serverLocation)){
     fs.mkdirSync(serverLocation);}
   if(!fs.existsSync(jarsLocation)){
@@ -185,7 +206,6 @@ function initializeBackend(){
   updateJarList();
   updatePluginsList();
 }
-initializeBackend();
 exports.updateDatabase = updateDB;
 exports.readDatabase=readDB;
 exports.updateJarList = updateJarList;
@@ -197,3 +217,5 @@ exports.stopWorld=stopWorld;
 exports.startWorld=startWorld;
 exports.openWorld=openWorld;
 exports.removeRunningInstance=removeRunningInstance;
+exports.openSettings=openSettings;
+exports.openSystemFolder=openSystemFolder;

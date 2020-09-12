@@ -8,7 +8,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
-    icon: __dirname + '/creeper.png',
+    icon: __dirname + '/icon.png',
     session:true
   })
 

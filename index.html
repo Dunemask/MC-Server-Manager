@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <title>Minecraft Server Console</title>
     <link rel="stylesheet" href="index.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
   <body>
                 <div class="link-wrapper">
                   <ul>
                     <li><a id="overviewLink" onclick="loadContent('overview',true)">Overview</a></li>
                     <li><a id="createLink" onclick="loadContent('createPage')">Create Server</a></li>
-                    <li><a id="globalSettingsLink">Settings</a></li>
+                    <li><a id="globalSettingsLink" onclick="mgr.openSettings()">Settings</a></li>
                   </ul>
                 </div>
     <div class="content">
         <div id='overviewConsole'>
-            <h1 id="overviewTitle">Console Management</h1>
+            <h1 id="overviewTitle">Console Management <i class="fa fa-folder-open" onclick="mgr.openSystemFolder()" id="openSystemFolder"></i></h1>
             <h3 id="ramUsage">Total Ram ${0}/${1} </h3>
           <div id="liveServers">
           </div>
