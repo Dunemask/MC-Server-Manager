@@ -302,6 +302,15 @@ function addListeners(){
         this.disabled=true;
         this.parentElement.querySelector('.discardServerChanges').disabled=true;
         loadContent('overview');
+        let settingsTriggerButtons = document.getElementsByClassName('serverSettingsTrigger');
+        for(let b in settingsTriggerButtons){
+          if(settingsTriggerButtons[b].children){
+            settingsTriggerButtons[b].addEventListener('click',function(){
+              let hiddenSettings=settingsTriggerButtons[b].closest('.databaseServer').getElementsByClassName('serverSettings')[0]
+              hiddenSettings.style.display= hiddenSettings.style.display=='block'?'none':'block';
+            })
+          }
+        }
       }
     })
     }
