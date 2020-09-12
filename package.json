@@ -1,6 +1,6 @@
 {
   "name": "mcservermanager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Minecraft Server Mangement App",
   "main": "app.js",
   "scripts": {
