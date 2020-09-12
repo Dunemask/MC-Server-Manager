@@ -77,7 +77,7 @@ function stopWorld(name){
     if(global.serverInstances[i].server.name==name){
       let pid = global.serverInstances[i].process.pid;
       tk(pid); //Tree KIll
-      global.ramInUse-= parseInt(global.serverInstances[i].server.ram);
+      global.ramInUse= parseInt(global.ramInUse)-parseInt(global.serverInstances[i].server.ram);
       global.ramInUse = global.ramInUse>0? 0:global.ramInUse;
       removeRunningInstance(name);
       return true;
@@ -121,7 +121,7 @@ function startWorld(name){
   }
   if(!server){
     return 'Server Not Found!';}
-  if(parseInt(server.ram)+global.ramInUse>global.db.ramCapacity){
+  if(parseInt(server.ram)+parseInt(global.ramInUse)>global.db.ramCapacity){
     return 'Launching a new Instance Uses Too Much Ram!'
   }
 
@@ -170,7 +170,7 @@ cp.addListener('close', (evt) =>{
   removeRunningInstance(name);
 });
   global.serverInstances.push({ server:server,process:cp});
-  global.ramInUse+=parseInt(server.ram);
+  global.ramInUse=parseInt(server.ram)+parseInt(global.ramInUse);
   return 'started';
 }
 function initializeBackend(){

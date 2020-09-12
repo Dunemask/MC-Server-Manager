@@ -147,9 +147,20 @@ function loadOverview(forceReload){
     }
     dbServers+='</ul>'
     databaseServers.innerHTML=dbServers;
+  }else{
+    let headers = document.querySelectorAll('.databaseServer > h2');
+    for(let h in headers){
+      for(let s in global.serverInstances){
+        if(headers[h] instanceof Element && headers[h].innerHTML==global.serverInstances[s].server.name){
+          headers[h].closest('.databaseServer').parentElement.remove();
+        }
+      }
+
+    }
   }
 }
 function stopWorld(name){
+
   mgr.stopWorld(name);
   loadContent('overview');
 }
@@ -318,7 +329,7 @@ function addListeners(){
 
 window.onbeforeunload = function(event){
   sessionStorage.setItem("serverInstances", JSON.stringify(global.serverInstances,null,1));
-  sessionStorage.setItem('ramInUse',ramInUse);
+  sessionStorage.setItem('ramInUse',global.ramInUse);
 }
 loadContent('overview')
 //Load Global Elements and assign event listeners
