@@ -1,22 +1,103 @@
+:root {
+  --main-bg-color: rgba(242,242,242,1);
+  --main-accent-color: #333333;
+}
 html{
-  background-color: white;
+  background-color: var(--main-bg-color);
+  overflow-y:hidden;
+}
+body{
+  margin:0px;
 }
 
 ul{
     list-style:none;
     padding:0px;
 }
+.link-wrapper > ul > li{
+  display: inline-block;
+  color:white;
+  padding:20px 10px;
+}
+
+.link-wrapper > ul > li a:hover{
+  color:lime;
+  cursor:pointer;
+}
+.link-wrapper > ul{
+  margin:0;
+  padding:2px 20px;
+  background-color: var(--main-accent-color);
+}
+
+.link-wrapper{
+  position:fixed;
+  width:100%;
+}
+
+.content{
+    border-radius:10px;
+    padding-top: 60px;
+    padding-left: 10px;
+}
 
 #databaseServers > ul{
-  background-color: gray;
-  padding:20px;
   list-style: none;
+
 }
 
-#databaseServers > li{
-  background-color: gray;
+#create{
+  background-color:white;
+  border-radius: 10px;
+  padding:20px 10px;
 }
 
-.databaseServer > h2{
-  background-color: white;
+#overviewConsole{
+  height:900px;
+  overflow-y: scroll;
+}
+
+
+.serverEvents li{
+  display:inline-block;
+}
+
+.serverSettings{
+  display:none;
+}
+
+.serverSettingsTrigger{
+
+}
+
+.pluginSelector li{
+  display: inline-block;
+    vertical-align: top;
+    padding:5px;
+}
+
+.databaseServer {
+  background-color:white;
+  border-radius: 10px;
+  padding:0px 10px;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

@@ -1,5 +1,5 @@
 const mgr = require('./mcmanager');
-const emptyRamString = 'Ram ${0}/${1}';
+const emptyRamString = 'Total Ram ${0}/${1}';
 let storedServerInstances = JSON.parse(sessionStorage.getItem("serverInstances"));
 let storedRamInUse = sessionStorage.getItem("ramInUse");
 global.serverInstances=storedServerInstances? storedServerInstances:[];
@@ -43,7 +43,7 @@ let pluginsSelector = function(server){
  if(server){
    for(let plugin in pluginsList){
      modSelector+=`<li><label for="${server.name}-plugin-${pluginsList[plugin]}">${pluginsList[plugin]}</label>`
-     modSelector+=`<input type="checkbox" id="${server.name}-plugin-${pluginsList[plugin]}" name="${server.name}-plugin-${pluginsList[plugin]}"`;
+     modSelector+=`<input type="checkbox" id="${server.name}-plugin-${pluginsList[plugin]}" name="${server.name}-plugin-${pluginsList[plugin]}" class="${pluginsList[plugin]}"`;
      if(server.plugins.includes(pluginsList[plugin])){
        modSelector+='checked';
      }
@@ -70,11 +70,40 @@ function loadContent(content){
   //overviewConsole content;
   if(content=='overview'){
     loadOverview();
+    addListeners();
     overviewConsole.style.display="block";
   }else if(content=="createPage"){
     loadCreate();
     createPage.style.display="block";
   }
+}
+
+function loadOverviewServer(server,openSettings){
+  let serverContent = `<li><div class="databaseServer" id="serverOptions-${server.name}">`
+  serverContent+=`<h2>${server.name}</h2>`
+  serverContent+='<div class="serverEvents"><ul>'
+  serverContent+=`<li><button onclick="startWorld('${server.name}')">Start</button></li>`
+  serverContent+=`<li><button onclick="mgr.openWorld('${server.name}')">Show Files</button></li>`
+  serverContent+=`<li><button onclick="deleteWorld('${server.name}')">Delete</button></li>`
+  serverContent+=`<li><button class="serverSettingsTrigger">Settings</button></li>`
+  serverContent+='</ul></div>'
+  serverContent+='<div class="serverSettings"';
+  if(openSettings){
+    serverContent+='style="display:block"';
+  }
+  serverContent+='><h3>Ram</h3>'
+  serverContent+=ramOption(server);
+  serverContent+='<h3>Version</h3>'
+  serverContent+=jarSelector(server);
+  serverContent+='<div class="pluginSelector">'
+  serverContent+='<h3>Plugins/Mods</h3>'
+  serverContent+=pluginsSelector(server);
+  serverContent+='</div>'
+  serverContent+=`<button class="saveServerChanges" disabled>Save</button>`
+  serverContent+=`<button class="discardServerChanges" disabled>Discard</button>`
+  serverContent+='</div>'
+  serverContent+= '</li></div>'
+  return serverContent;
 }
 function loadOverview(){
   //Running Instance Render
@@ -86,18 +115,18 @@ function loadOverview(){
       let instance = '<div class="serverInstance"'
       let server = global.serverInstances[i].server;
       instance+=`<h2>${server.name}</h2>`
-      instance+=`<button onclick="stopWorld('${server.name}')">Stop</button>`
+      instance+=`<button class="stopWorldButton" onclick="stopWorld('${server.name}')">Stop</button>`
       instance+=`<h3>Ram ${server.ram}MB</h3>`
       instance+='</div>'
       serverInstances+=instance;
     }
     liveServers.innerHTML=serverInstances;
   }
+  let discardButtons = document.querySelectorAll('.discardServerChanges');
   //Database Server Render
   if(global.db.servers.length==0){
     databaseServers.innerHTML='<h3>No Servers Found '+createLink.innerHTML+'</h3>';
-  }else{
-    let dbServers = '<ul>';
+  }else if(discardButtons.length==0){
     //Create local copy of servers we can adjust
     let servers = []
     for(let s in global.db.servers){
@@ -110,25 +139,11 @@ function loadOverview(){
         servers.splice(s,1);
       }
     }
+    let dbServers = '<ul>';
+    //Add All Servers Using Formula in loadOverviewServer(server);
+    //If the discard button is selected, we know that server has been edited and shouldn't be remade
     for(let s in servers){
-      let serverContent = `<li><div class="databaseServer" id="serverOptions-${servers[s].name}">`
-      serverContent+=`<h2>${servers[s].name}</h2>`
-      serverContent+='<div class="serverEvents"><ul>'
-      serverContent+=`<li><button onclick="startWorld('${servers[s].name}')">Start</button></li>`
-      serverContent+=`<li><button onclick="mgr.openWorld('${servers[s].name}')">Show Files</button></li>`
-      serverContent+=`<li><button onclick="deleteWorld('${servers[s].name}')">Delete</button></li>`
-      serverContent+='</ul></div>'
-      serverContent+='<button class="serverSettingsTrigger">Settings</button>'
-      serverContent+='<div class="serverSettings">'
-      serverContent+='<h3>Ram</h3>'
-      serverContent+=ramOption(servers[s]);
-      serverContent+='<h3>Version</h3>'
-      serverContent+=jarSelector(servers[s]);
-      serverContent+='<h3>Plugins/Mods</h3>'
-      serverContent+=pluginsSelector(servers[s]);
-      serverContent+='</div>'
-      serverContent+= '</li></div>'
-      dbServers+=serverContent;
+      dbServers+=loadOverviewServer(servers[s]);
     }
     dbServers+='</ul>'
     databaseServers.innerHTML=dbServers;
@@ -163,10 +178,10 @@ function loadCreate(){
     createPage.innerHTML=createContent;
   }
   document.getElementById('createWorldButton').disabled= serverNameTaken(defaultName);
-  document.getElementById('createName').addEventListener('change',function(){
+  document.getElementById('createName').addEventListener('input',function(){
     document.getElementById('createWorldButton').disabled= serverNameTaken(document.getElementById('createName').value)
   });
-  createPage.querySelector('input[name=ramSelector]').addEventListener('change',function(){
+  createPage.querySelector('input[name=ramSelector]').addEventListener('input',function(){
     document.getElementById('createWorldButton').disabled= isNaN(createPage.querySelector('input[name=ramSelector]').value);
   });
 
@@ -198,8 +213,99 @@ function buildWorld(){
   mgr.updateDatabase();
   loadContent('overview');
 }
-
 function addListeners(){
+  let settingsTriggerButtons = document.getElementsByClassName('serverSettingsTrigger');
+  for(let b in settingsTriggerButtons){
+    if(settingsTriggerButtons[b].children){
+      settingsTriggerButtons[b].addEventListener('click',function(){
+        let hiddenSettings=settingsTriggerButtons[b].closest('.databaseServer').getElementsByClassName('serverSettings')[0]
+        hiddenSettings.style.display= hiddenSettings.style.display=='block'?'none':'block';
+      })
+    }
+  }
+  let settingsPanels = document.getElementsByClassName('serverSettings');
+  let ramTmp = 0;
+  let ramInput;
+  let settingsSaveButton;
+  let settingsDiscardButton;
+  let jarSelector;
+  let pluginsSelector;
+  let plugin;
+  for(let s in settingsPanels){
+    if(settingsPanels[s].children){
+      ramInput = settingsPanels[s].querySelector('input[name=ramSelector]');
+      jarSelector = settingsPanels[s].querySelector('select');
+      pluginsSelector = settingsPanels[s].querySelectorAll('.pluginSelector > ul > li');
+      settingsSaveButton = settingsPanels[s].querySelector('.saveServerChanges');
+      settingsDiscardButton = settingsPanels[s].querySelector('.discardServerChanges');
+      ramInput.defaultValue=ramInput.value;
+      ramInput.addEventListener('input',function(){
+        settingsSaveButton = settingsPanels[s].querySelector('.saveServerChanges');
+        settingsDiscardButton = settingsPanels[s].querySelector('.discardServerChanges');
+        ramTmp = this.value;
+        settingsSaveButton.disabled = settingsSaveButton.disabled? (isNaN(ramTmp) || ramTmp==this.defaultValue):false;
+        settingsDiscardButton.disabled = settingsDiscardButton.disabled? ramTmp==this.defaultValue:false;
+      });
+      jarSelector.defaultValue= jarSelector.options[jarSelector.selectedIndex].value;
+      jarSelector.addEventListener('change',function(){
+        settingsSaveButton = settingsPanels[s].querySelector('.saveServerChanges');
+        settingsDiscardButton = settingsPanels[s].querySelector('.discardServerChanges');
+        settingsSaveButton.disabled = settingsSaveButton.disabled? this.options[this.selectedIndex].value ==this.defaultValue:false;
+        settingsDiscardButton.disabled = settingsDiscardButton.disabled? this.options[this.selectedIndex].value ==this.defaultValue:false;
+      })
+      for(let p in pluginsSelector){
+        if(pluginsSelector[p].children)
+          plugin = pluginsSelector[p].querySelector('input[type="checkbox"]');
+          plugin.defaultValue=plugin.checked;
+          plugin.addEventListener('change',function(){
+            settingsSaveButton = settingsPanels[s].querySelector('.saveServerChanges');
+            settingsDiscardButton = settingsPanels[s].querySelector('.discardServerChanges');
+            settingsSaveButton.disabled = settingsDiscardButton.disabled? `${this.checked}`==this.defaultValue:false;
+            settingsDiscardButton.disabled = settingsDiscardButton.disabled?`${this.checked}`==this.defaultValue:false;
+          })
+        }
+    settingsDiscardButton.addEventListener('click',function(){
+      let name =  settingsPanels[s].parentElement.querySelector('h2').innerHTML;
+      this.disabled=true;
+      this.parentElement.querySelector('.saveServerChanges').disabled=true;
+      let oldDisplay = this.closest('.serverSettings').style.display;
+      for(let s in global.db.servers){
+        if(global.db.servers[s].name==name){
+          this.closest('.databaseServer').parentElement.innerHTML=loadOverviewServer(global.db.servers[s],true);
+          console.log(loadOverviewServer(global.db.servers[s]));
+          break;
+        }
+      }
+      loadContent('overview');
+
+    })
+    settingsSaveButton.addEventListener('click',function(){
+      let name =  settingsPanels[s].parentElement.querySelector('h2').innerHTML;
+      let ramInput = settingsPanels[s].querySelector('input[name=ramSelector]');
+      let jarSelector = settingsPanels[s].querySelector('select');
+      let pluginsSelector = settingsPanels[s].querySelectorAll('.pluginSelector > ul > li');
+      let ram = ramInput.value;
+      let jar = jarSelector.options[jarSelector.selectedIndex].value;
+      let plugins = [];
+      for(let p in pluginsSelector){
+        if(pluginsSelector[p].children){
+          if(pluginsSelector[p].querySelector('input[type="checkbox"]').checked){
+            plugins.push(pluginsSelector[p].querySelector('input[type="checkbox"]').className);
+          }
+        }
+      }
+      if(isNaN(ram)){
+        alert('Please ensure the ram is a number only and try again');
+      }else{
+        let server={name,ram,jar,plugins};
+        mgr.updateServer(server);
+        this.disabled=true;
+        this.parentElement.querySelector('.discardServerChanges').disabled=true;
+        loadContent('overview');
+      }
+    })
+    }
+  }
 
 }
 
@@ -213,4 +319,3 @@ loadCreate();
 loadContent('overview')
 //Load Global Elements and assign event listeners
 const createWorldButton = document.getElementById('createWorldButton');
-addListeners();

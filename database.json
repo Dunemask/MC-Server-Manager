@@ -14,10 +14,11 @@
    "plugins": []
   },
   {
-   "name": "Creative",
+   "name": "Survival2",
    "ram": "2048",
    "jar": "Vanilla-1.15.2.jar",
    "plugins": [
+    "BedrockLook.jar",
     "DeathSwap.jar",
     "Manhunt.jar"
    ]

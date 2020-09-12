@@ -105,6 +105,7 @@ function updateServer(server){
   for(s in global.db.servers){
     if(global.db.servers[s].name==server.name){
       global.db.servers[s]=server;
+      updateDB();
       return;
     }
   }

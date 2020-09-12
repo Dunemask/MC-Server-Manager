@@ -6,24 +6,17 @@
     <link rel="stylesheet" href="index.css"/>
   </head>
   <body>
-    <div class="sidenav-wrapper">
-              <div class="sidenav">
                 <div class="link-wrapper">
-                  <h2>Navigation</h2>
                   <ul>
                     <li><a id="overviewLink" onclick="loadContent('overview')">Overview</a></li>
                     <li><a id="createLink" onclick="loadContent('createPage')">Create Server</a></li>
                     <li><a id="globalSettingsLink">Settings</a></li>
                   </ul>
                 </div>
-              </div>
-            </div>
     <div class="content">
-      <div class="overview">
-        <h3 id="ramUsage">Ram ${0}/${1} </h3>
-        <h2 id="overviewTitle">Console Management</h2>
-      </div>
         <div id='overviewConsole'>
+            <h1 id="overviewTitle">Console Management</h1>
+            <h3 id="ramUsage">Total Ram ${0}/${1} </h3>
           <div id="liveServers">
           </div>
           <div id="databaseServers">
