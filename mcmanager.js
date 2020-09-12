@@ -4,6 +4,7 @@ const child_process = require('child_process');
 const tk = require('tree-kill');
 const homedir = require('os').homedir();
 const path = require('path');
+const rimraf = require("rimraf");
 //Define Constants
 const resourcesLocation = path.join(homedir+'/mcservermanager/');
 const management = resourcesLocation+'server-manager/';
@@ -73,7 +74,7 @@ function deleteWorld(name,deleteFiles){ //TODO
     }
   }
   if(deleteFiles){
-    console.log("Would Remove World Files")
+    rimraf.sync(`${serverLocation}${name}`);
   }
 }
 function stopWorld(name){

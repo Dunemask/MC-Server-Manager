@@ -163,14 +163,14 @@ function loadOverview(forceReload){
 function stopWorld(name){
 
   mgr.stopWorld(name);
-  loadContent('overview');
+  loadContent('overview',true);
 }
 function startWorld(name){
   mgr.startWorld(name);
   loadContent('overview');
 }
 function deleteWorld(name){
-  mgr.deleteWorld(name);
+  mgr.deleteWorld(name,true);
   mgr.updateDatabase();
   let headers = document.querySelectorAll('.databaseServer > h2');
   for(let h in headers){
