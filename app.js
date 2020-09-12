@@ -1,5 +1,6 @@
 const electron = require('electron');
 const { app, BrowserWindow } = require('electron')
+//Define Constants
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -14,8 +15,8 @@ function createWindow () {
 
   // and load the index.html of the app.
   win.loadFile('index.html')
-  //win.webContents.openDevTools()
-  win.removeMenu();
+  win.webContents.openDevTools()
+  //win.removeMenu();
 }
 
 app.whenReady().then(createWindow)

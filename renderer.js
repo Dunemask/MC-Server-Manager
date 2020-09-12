@@ -1,9 +1,5 @@
 const mgr = require('./mcmanager');
 const emptyRamString = 'Total Ram ${0}/${1}';
-let storedServerInstances = JSON.parse(sessionStorage.getItem("serverInstances"));
-let storedRamInUse = sessionStorage.getItem("ramInUse");
-global.serverInstances=storedServerInstances? storedServerInstances:[];
-global.ramInUse = storedRamInUse?storedRamInUse:0;
 let jarList=mgr.updateJarList();
 let pluginsList=mgr.updatePluginsList();
 function dynamicUpdate(element,items){
@@ -67,7 +63,7 @@ function loadContent(content,forceReload){
   createPage.style.display="none";
   globalSettings.style.display="none";
   ramUsageHeader.innerHTML=emptyRamString;
-  dynamicUpdate(ramUsageHeader,{0:global.ramInUse,1:global.db.ramCapacity});
+  dynamicUpdate(ramUsageHeader,{0:global.db.ramInUse,1:global.db.ramCapacity});
   //overviewConsole content;
   if(content=='overview'){
     loadOverview(forceReload);
@@ -108,16 +104,17 @@ function loadOverviewServer(server,openSettings){
 }
 function loadOverview(forceReload){
   //Running Instance Render
-  if(global.serverInstances.length==0){
+  if(global.db.serverInstances.length==0){
     liveServers.innerHTML='<h3>No Servers Running</h3>'
   }else{
     let serverInstances =``
-    for(let i in global.serverInstances){
+    for(let i in global.db.serverInstances){
       let instance = '<div class="serverInstance"'
-      let server = global.serverInstances[i].server;
+      let server = global.db.serverInstances[i].server;
       instance+=`<h2>${server.name}</h2>`
       instance+=`<button class="stopWorldButton" onclick="stopWorld('${server.name}')">Stop</button>`
       instance+=`<h3>Ram ${server.ram}MB</h3>`
+      instance+='<button class="stopAllButton" onclick=stopAllWorlds()>Stop All</button>'
       instance+='</div>'
       serverInstances+=instance;
     }
@@ -134,9 +131,9 @@ function loadOverview(forceReload){
       servers.push(global.db.servers[s])
     }
     //Remove all duplicates of the running instances
-    for(let i in global.serverInstances){
+    for(let i in global.db.serverInstances){
       for(let s = servers.length-1;s>=0;s--)
-      if(servers[s].name==global.serverInstances[i].server.name){
+      if(servers[s].name==global.db.serverInstances[i].server.name){
         servers.splice(s,1);
       }
     }
@@ -151,8 +148,8 @@ function loadOverview(forceReload){
   }else{
     let headers = document.querySelectorAll('.databaseServer > h2');
     for(let h in headers){
-      for(let s in global.serverInstances){
-        if(headers[h] instanceof Element && headers[h].innerHTML==global.serverInstances[s].server.name){
+      for(let s in global.db.serverInstances){
+        if(headers[h] instanceof Element && headers[h].innerHTML==global.db.serverInstances[s].server.name){
           headers[h].closest('.databaseServer').parentElement.remove();
         }
       }
@@ -161,8 +158,11 @@ function loadOverview(forceReload){
   }
 }
 function stopWorld(name){
-
   mgr.stopWorld(name);
+  loadContent('overview',true);
+}
+function stopAllWorlds(){
+  mgr.stopAllWorlds();
   loadContent('overview',true);
 }
 function startWorld(name){
@@ -336,8 +336,7 @@ function addListeners(){
 }
 
 window.onbeforeunload = function(event){
-  sessionStorage.setItem("serverInstances", JSON.stringify(global.serverInstances,null,1));
-  sessionStorage.setItem('ramInUse',global.ramInUse);
+
 }
 loadContent('overview')
 //Load Global Elements and assign event listeners

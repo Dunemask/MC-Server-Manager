@@ -31,11 +31,12 @@ function updatePluginsList(){
 return pluginsList;
 }
 function removeRunningInstance(name){
-  for(let i in global.serverInstances){
-    if(global.serverInstances[i].server.name==name){
-      global.serverInstances.splice(i, 1);
+  for(let i in global.db.serverInstances){
+    if(global.db.serverInstances[i].server.name==name){
+      global.db.serverInstances.splice(i, 1);
     }
   }
+  updateDB();
 }
 function updateJarList(){
   let jarList = [];
@@ -77,13 +78,24 @@ function deleteWorld(name,deleteFiles){ //TODO
     rimraf.sync(`${serverLocation}${name}`);
   }
 }
+
+function stopAllWorlds(){
+  for(let i in global.db.serverInstances){
+    let pid = global.db.serverInstances[i].process.pid;
+    tk(pid); //Tree KIll
+    global.db.ramInUse= parseInt(global.db.ramInUse)-parseInt(global.db.serverInstances[i].server.ram);
+    global.db.ramInUse = global.db.ramInUse>0? 0:global.db.ramInUse;
+    removeRunningInstance(global.db.serverInstances[i].server.name);
+  }
+}
+
 function stopWorld(name){
-  for(i in global.serverInstances){
-    if(global.serverInstances[i].server.name==name){
-      let pid = global.serverInstances[i].process.pid;
+  for(i in global.db.serverInstances){
+    if(global.db.serverInstances[i].server.name==name){
+      let pid = global.db.serverInstances[i].process.pid;
       tk(pid); //Tree KIll
-      global.ramInUse= parseInt(global.ramInUse)-parseInt(global.serverInstances[i].server.ram);
-      global.ramInUse = global.ramInUse>0? 0:global.ramInUse;
+      global.db.ramInUse= parseInt(global.db.ramInUse)-parseInt(global.db.serverInstances[i].server.ram);
+      global.db.ramInUse = global.db.ramInUse>0? 0:global.db.ramInUse;
       removeRunningInstance(name);
       return true;
     }
@@ -129,7 +141,7 @@ function startWorld(name){
   }
   if(!server){
     return 'Server Not Found!';}
-  if(parseInt(server.ram)+parseInt(global.ramInUse)>global.db.ramCapacity){
+  if(parseInt(server.ram)+parseInt(global.db.ramInUse)>global.db.ramCapacity){
     return 'Launching a new Instance Uses Too Much Ram!'
   }
 
@@ -177,8 +189,12 @@ cp.addListener('close', (evt) =>{
   console.log('Closed!');
   removeRunningInstance(name);
 });
-  global.serverInstances.push({ server:server,process:cp});
-  global.ramInUse=parseInt(server.ram)+parseInt(global.ramInUse);
+  global.db.serverInstances.push({ server:server,process:cp});
+  if(global.db.ramInUse==null){
+    global.db.ramInUse=0;
+  }
+  global.db.ramInUse=parseInt(server.ram)+parseInt(global.db.ramInUse);
+  updateDB();
   return 'started';
 }
 function initializeBackend(){
@@ -215,6 +231,7 @@ exports.updateServer = updateServer;
 exports.createWorld = createWorld;
 exports.deleteWorld = deleteWorld;
 exports.stopWorld=stopWorld;
+exports.stopAllWorlds=stopAllWorlds;
 exports.startWorld=startWorld;
 exports.openWorld=openWorld;
 exports.removeRunningInstance=removeRunningInstance;
