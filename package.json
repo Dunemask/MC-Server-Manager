@@ -6,7 +6,7 @@
   "scripts": {
     "test": "electron .",
     "build": "electron-builder --dir",
-    "pack": "electron-packager . 'mcservermanager' --out dist/ --overwrite --icon=./icons/icon.png --all",
+    "pack": "electron-packager . mcservermanager --out dist/ --overwrite --icon=./icons/icon.png --all",
     "pack-deb": "electron-installer-debian --src dist/mcservermanager-linux-x64/ --arch amd64 --config deb-package-config.json",
     "pack-mac": "electron-installer-dmg dist/mcservermanager-linux-x64/ mcservermanager --out=dist/ --icon=icons/icon.png --title='Minecraft Server Manager' --overwrite",
     "pack-win": "electron-installer-windows --src dist/mcservermanager-win32-x64/ --dest dist/installers/ --config deb-package-config.json",
