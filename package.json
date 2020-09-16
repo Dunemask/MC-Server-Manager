@@ -10,7 +10,11 @@
     "pack-deb": "electron-installer-debian --src dist/mcservermanager-linux-x64/ --arch amd64 --config deb-installer.json",
     "pack-mac": "electron-installer-dmg dist/mcservermanager-linux-x64/ mcservermanager --out=dist/ --icon=src/icons/icon.png --title='Minecraft Server Manager' --overwrite",
     "pack-win": "electron-installer-windows --src dist/mcservermanager-win32-x64/ --dest dist/installers/ --config win-installer.json",
-    "dist-deb": "npm run pack && npm run pack-deb"
+    "pack-winalt":"zip -FSr dist/installers/mcmanager-windowsx64.zip dist/mcservermanager-win32-x64",
+    "dist-deb": "npm run pack && npm run pack-deb",
+    "dist-win": "npm run pack && npm run pack-win",
+    "dist-all": "npm run pack && npm run pack-deb && npm run pack-win && notify-send 'Finished Building'",
+    "dist-full":"npm run dist-all && npm run pack-winalt"
   },
   "repository": {
     "type": "git",
