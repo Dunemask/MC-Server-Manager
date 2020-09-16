@@ -10,7 +10,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
-    icon: __dirname + '/icons/icon32.png',
+    icon: __dirname + 'src//icons/icon.png',
     session:true
   })
 

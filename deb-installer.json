@@ -1,10 +1,10 @@
 {
   "dest": "dist/installers/",
-  "icon": "icons/icon.png",
+  "icon": "src/icons/icon.png",
   "categories": [
     "Utility"
   ],
   "productName":"Minecraft Server Manager",
   "genericName":"Minecraft Server Manager",
-  "description":"Minecraft Server Manager build with Electron"
+  "description":"Minecraft Server Manager built with Electron"
 }

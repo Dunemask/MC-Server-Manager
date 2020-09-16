@@ -96,7 +96,7 @@ function stopAllWorlds(){
     tk(pid); //Tree KIll
     removeRunningInstance(global.instancelock.serverInstances[i].server.name);
   }
-  global.instanceLock.ramInUse=0;
+  global.instancelock.ramInUse=0;
 }
 
 function stopWorld(name){

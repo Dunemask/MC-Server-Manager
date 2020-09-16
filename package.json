@@ -6,9 +6,9 @@
   "scripts": {
     "test": "electron .",
     "build": "electron-builder --dir",
-    "pack": "electron-packager . mcservermanager --out dist/ --overwrite --icon=./icons/icon.png --all",
+    "pack": "electron-packager . mcservermanager --out dist/ --overwrite --icon=src/icons/icon.png --all",
     "pack-deb": "electron-installer-debian --src dist/mcservermanager-linux-x64/ --arch amd64 --config deb-installer.json",
-    "pack-mac": "electron-installer-dmg dist/mcservermanager-linux-x64/ mcservermanager --out=dist/ --icon=icons/icon.png --title='Minecraft Server Manager' --overwrite",
+    "pack-mac": "electron-installer-dmg dist/mcservermanager-linux-x64/ mcservermanager --out=dist/ --icon=src/icons/icon.png --title='Minecraft Server Manager' --overwrite",
     "pack-win": "electron-installer-windows --src dist/mcservermanager-win32-x64/ --dest dist/installers/ --config win-installer.json",
     "dist-deb": "npm run pack && npm run pack-deb"
   },
@@ -20,13 +20,14 @@
   "license": "GPL2.1",
   "devDependencies": {
     "electron": "^10.1.2",
-    "electron-builder": "^22.8.0"
+    "electron-builder": "^22.8.0",
+    "electron-installer-dmg": "^3.0.0",
+    "electron-installer-windows": "^3.0.0",
+    "electron-packager": "^15.1.0"
   },
   "dependencies": {
     "child_process": "^1.0.2",
-    "electron-installer-dmg": "^3.0.0",
-    "electron-installer-windows": "^3.0.0",
-    "electron-packager": "^15.1.0",
+    "electron-installer-debian": "^3.1.0",
     "path": "^0.12.7",
     "rimraf": "^3.0.2",
     "tree-kill": "^1.2.2"
@@ -38,7 +39,7 @@
         "deb",
         "AppImage"
       ],
-      "icon": "./icon32.png",
+      "icon": "src/icons/icon.png",
       "synopsis": "Minecraft Server Manager build with Electron"
     },
     "icon": "./icon32.png"
