@@ -7,6 +7,6 @@
   "productName":"Minecraft Server Manager",
   "genericName":"Minecraft Server Manager",
   "description":"Minecraft Server Manager built with Electron",
-  "animation":"src/creepercycle.gif",
+  "animation":"src/build/creepercycle.gif",
   "noMsi":"true"
 }

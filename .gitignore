@@ -4,3 +4,4 @@ server-manager/plugins/
 server-manager/servers/
 database.json
 dist/
+package-lock.json
