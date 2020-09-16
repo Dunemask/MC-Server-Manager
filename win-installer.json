@@ -6,5 +6,7 @@
   ],
   "productName":"Minecraft Server Manager",
   "genericName":"Minecraft Server Manager",
-  "description":"Minecraft Server Manager build with Electron"
+  "description":"Minecraft Server Manager build with Electron",
+  "animation":"creepercycle.gif",
+  "noMsi":"true"
 }

@@ -19,14 +19,14 @@
   "author": "Dunemask",
   "license": "GPL2.1",
   "devDependencies": {
-    "electron": "^10.1.1",
-    "electron-builder": "^22.8.0",
-    "electron-installer-debian": "^3.1.0"
+    "electron": "^10.1.2",
+    "electron-builder": "^22.8.0"
   },
   "dependencies": {
     "child_process": "^1.0.2",
     "electron-installer-dmg": "^3.0.0",
     "electron-installer-windows": "^3.0.0",
+    "electron-packager": "^15.1.0",
     "path": "^0.12.7",
     "rimraf": "^3.0.2",
     "tree-kill": "^1.2.2"
