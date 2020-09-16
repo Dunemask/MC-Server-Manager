@@ -32,6 +32,9 @@ let jarSelector = function(server){
   versionSelector+=`<option value="${jarList[jar]}">${jarList[jar]}</option>`
   }
   versionSelector+='</select>';
+  if(jarList.length==0){
+    versionSelector+='<span class="emptyJarMessage"><a onclick="mgr.openServerProvider()">Download </a>minecraft server jars and put them into the jars folder <i class="fa fa-folder-open" onclick="mgr.openJarsFolder()"></i></span>'
+  }
   return versionSelector;
 }
 let pluginsSelector = function(server){
@@ -63,7 +66,7 @@ function loadContent(content,forceReload){
   createPage.style.display="none";
   globalSettings.style.display="none";
   ramUsageHeader.innerHTML=emptyRamString;
-  dynamicUpdate(ramUsageHeader,{0:global.db.ramInUse,1:global.db.ramCapacity});
+  dynamicUpdate(ramUsageHeader,{0:global.instancelock.ramInUse,1:global.db.ramCapacity});
   //overviewConsole content;
   if(content=='overview'){
     loadOverview(forceReload);
@@ -104,26 +107,27 @@ function loadOverviewServer(server,openSettings){
 }
 function loadOverview(forceReload){
   //Running Instance Render
-  if(global.db.serverInstances.length==0){
+  if(global.instancelock.serverInstances.length==0){
     liveServers.innerHTML='<h3>No Servers Running</h3>'
   }else{
-    let serverInstances =``
-    for(let i in global.db.serverInstances){
-      let instance = '<div class="serverInstance"'
-      let server = global.db.serverInstances[i].server;
+    let serverInstances =`<div class="liveInstances"><ul>`
+    for(let i in global.instancelock.serverInstances){
+      let instance = '<li><div class="serverInstance"'
+      let server = global.instancelock.serverInstances[i].server;
       instance+=`<h2>${server.name}</h2>`
+      instance+=`<h3>Ram ${server.ram}MB</h3>`;
       instance+=`<button class="stopWorldButton" onclick="stopWorld('${server.name}')">Stop</button>`
-      instance+=`<h3>Ram ${server.ram}MB</h3>`
-      instance+='<button class="stopAllButton" onclick=stopAllWorlds()>Stop All</button>'
-      instance+='</div>'
+      instance+='</div></li>'
       serverInstances+=instance;
     }
+    serverInstances+=`</ul></div>`
+    serverInstances+='<button class="stopAllButton" onclick=stopAllWorlds()>Stop All</button>'
     liveServers.innerHTML=serverInstances;
   }
   let discardButtons = document.querySelectorAll('.discardServerChanges');
   //Database Server Render
   if(global.db.servers.length==0){
-    databaseServers.innerHTML='<h3>No Servers Found '+createLink.innerHTML+'</h3>';
+    databaseServers.innerHTML='<h3>No Servers Found</h3>';
   }else if(discardButtons.length==0||forceReload){
     //Create local copy of servers we can adjust
     let servers = []
@@ -131,9 +135,9 @@ function loadOverview(forceReload){
       servers.push(global.db.servers[s])
     }
     //Remove all duplicates of the running instances
-    for(let i in global.db.serverInstances){
+    for(let i in global.instancelock.serverInstances){
       for(let s = servers.length-1;s>=0;s--)
-      if(servers[s].name==global.db.serverInstances[i].server.name){
+      if(servers[s].name==global.instancelock.serverInstances[i].server.name){
         servers.splice(s,1);
       }
     }
@@ -148,8 +152,8 @@ function loadOverview(forceReload){
   }else{
     let headers = document.querySelectorAll('.databaseServer > h2');
     for(let h in headers){
-      for(let s in global.db.serverInstances){
-        if(headers[h] instanceof Element && headers[h].innerHTML==global.db.serverInstances[s].server.name){
+      for(let s in global.instancelock.serverInstances){
+        if(headers[h] instanceof Element && headers[h].innerHTML==global.instancelock.serverInstances[s].server.name){
           headers[h].closest('.databaseServer').parentElement.remove();
         }
       }
@@ -166,10 +170,17 @@ function stopAllWorlds(){
   loadContent('overview',true);
 }
 function startWorld(name){
-  mgr.startWorld(name);
+  let status = mgr.startWorld(name);
+  if(status.toLowerCase().includes('error')){
+    alert(status);
+    return;
+  }
   loadContent('overview');
 }
 function deleteWorld(name){
+  if(!confirm('Are you sure you want to delete '+name)){
+    return;
+  }
   mgr.deleteWorld(name,true);
   mgr.updateDatabase();
   let headers = document.querySelectorAll('.databaseServer > h2');
@@ -178,6 +189,7 @@ function deleteWorld(name){
       headers[h].closest('.databaseServer').parentElement.remove();
     }
   }
+  loadContent('overview');
 }
 function loadCreate(){
   let defaultName = 'Survival';
@@ -187,7 +199,7 @@ function loadCreate(){
     createContent+=`<input type="text" id="createName" name="createName" value="${defaultName}"></input>`
     createContent+='<h3>Ram</h3>'
     createContent+=ramOption();
-    createContent+='<h3>Version</h3>'
+    createContent+='<h3>Version <i class="fa fa-question-circle"></i></h3>'
     createContent+=jarSelector();
     createContent+='<h3>Plugins/Mods</h3>'
     createContent+=pluginsSelector();
@@ -214,7 +226,7 @@ function serverNameTaken(name){
 function buildWorld(){
   let name = document.getElementById('createName').value;
   if(serverNameTaken(name)){
-    loadContent('createPage');
+    alert('Server Already Exists With That Name!');
     return;
   }
   if(document.getElementById('minecraftVersionSelector').options.length==0){

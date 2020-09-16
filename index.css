@@ -1,6 +1,7 @@
 :root {
   --main-bg-color: rgba(242,242,242,1);
   --main-accent-color: #333333;
+  --main-link-color: dodgerblue;
 }
 html{
   background-color: var(--main-bg-color);
@@ -65,12 +66,21 @@ ul{
   display:inline-block;
 }
 
+.liveInstances li{
+  display:inline-block;
+}
+
 .serverSettings{
   display:none;
 }
 
-.serverSettingsTrigger{
-
+.serverInstance{
+  text-align: center;
+  display: block;
+  background-color: white;
+  max-width: 120px;
+  padding:5px;
+  border-radius:10px;
 }
 
 .pluginSelector li{
@@ -83,6 +93,16 @@ ul{
   background-color:white;
   border-radius: 10px;
   padding:0px 10px;
+}
+
+.emptyJarMessage{
+  padding:10px;
+}
+.emptyJarMessage a{
+  color: var(--main-link-color);
+}
+.emptyJarMessage a:hover{
+  cursor: pointer;
 }
 
 /* width */

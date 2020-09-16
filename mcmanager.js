@@ -9,19 +9,29 @@ const rimraf = require("rimraf");
 const resourcesLocation = path.join(homedir+'/mcservermanager/');
 const management = resourcesLocation+'server-manager/';
 const dbLocation = resourcesLocation+'database.json';
+const instanceLock = resourcesLocation+'instance-lock.json';
 const serverLocation = management+'servers/';
 const pluginsLocation = management+'plugins/';
 const jarsLocation = management+'jars/';
 initializeBackend();
 //Setup DB
 global.db = readDB();
+global.instancelock = readInstanceLock();
+function readInstanceLock(){
+  return JSON.parse(fs.readFileSync(instanceLock));
+}
+
 function readDB(){
   return JSON.parse(fs.readFileSync(dbLocation));
 }
 function updateDB(){
-  let data=JSON.stringify(db,null,1);
+  let data=JSON.stringify(global.db,null,1);
   fs.writeFileSync(dbLocation, data);
 }
+function updateInstanceLock(){
+  fs.writeFileSync(instanceLock, JSON.stringify(global.instancelock,null,1));
+}
+
 function updatePluginsList(){
   let pluginsList = [];
   filenames = fs.readdirSync(pluginsLocation);
@@ -31,13 +41,14 @@ function updatePluginsList(){
 return pluginsList;
 }
 function removeRunningInstance(name){
-  for(let i in global.db.serverInstances){
-    if(global.db.serverInstances[i].server.name==name){
-      global.db.serverInstances.splice(i, 1);
+  for(let i in global.instancelock.serverInstances){
+    if(global.instancelock.serverInstances[i].server.name==name){
+      global.instancelock.serverInstances.splice(i, 1);
     }
   }
-  updateDB();
+  updateInstanceLock();
 }
+
 function updateJarList(){
   let jarList = [];
   filenames = fs.readdirSync(jarsLocation);
@@ -80,22 +91,21 @@ function deleteWorld(name,deleteFiles){ //TODO
 }
 
 function stopAllWorlds(){
-  for(let i in global.db.serverInstances){
-    let pid = global.db.serverInstances[i].process.pid;
+  for(let i in global.instancelock.serverInstances){
+    let pid = global.instancelock.serverInstances[i].process.pid;
     tk(pid); //Tree KIll
-    global.db.ramInUse= parseInt(global.db.ramInUse)-parseInt(global.db.serverInstances[i].server.ram);
-    global.db.ramInUse = global.db.ramInUse>0? 0:global.db.ramInUse;
-    removeRunningInstance(global.db.serverInstances[i].server.name);
+    removeRunningInstance(global.instancelock.serverInstances[i].server.name);
   }
+  global.instanceLock.ramInUse=0;
 }
 
 function stopWorld(name){
-  for(i in global.db.serverInstances){
-    if(global.db.serverInstances[i].server.name==name){
-      let pid = global.db.serverInstances[i].process.pid;
+  for(i in global.instancelock.serverInstances){
+    if(global.instancelock.serverInstances[i].server.name==name){
+      let pid = global.instancelock.serverInstances[i].process.pid;
       tk(pid); //Tree KIll
-      global.db.ramInUse= parseInt(global.db.ramInUse)-parseInt(global.db.serverInstances[i].server.ram);
-      global.db.ramInUse = global.db.ramInUse>0? 0:global.db.ramInUse;
+      global.instancelock.ramInUse= parseInt(global.instancelock.ramInUse)-parseInt(global.instancelock.serverInstances[i].server.ram);
+      global.instancelock.ramInUse = global.instancelock.ramInUse<0? 0:global.instancelock.ramInUse;
       removeRunningInstance(name);
       return true;
     }
@@ -111,6 +121,9 @@ function openSettings(){
 
 function openSystemFolder(){
   shell.openPath(resourcesLocation);
+}
+function openJarsFolder(){
+  shell.openPath(jarsLocation);
 }
 
 function openWorld(serverName){
@@ -131,6 +144,10 @@ function updateServer(server){
   }
   return true;
 }
+
+function openServerProvider(){
+  shell.openExternal(`https://mcversions.net/`)
+}
 function startWorld(name){
   let server;
   for(i in global.db.servers){
@@ -140,9 +157,9 @@ function startWorld(name){
     }
   }
   if(!server){
-    return 'Server Not Found!';}
-  if(parseInt(server.ram)+parseInt(global.db.ramInUse)>global.db.ramCapacity){
-    return 'Launching a new Instance Uses Too Much Ram!'
+    return 'ERROR: Server Not Found!';}
+  if(parseInt(server.ram)+parseInt(global.instancelock.ramInUse)>global.db.ramCapacity){
+    return 'ERROR: Launching a new Instance Uses Too Much Ram!'
   }
 
   let serverDir=serverLocation+`${name}/`
@@ -189,12 +206,12 @@ cp.addListener('close', (evt) =>{
   console.log('Closed!');
   removeRunningInstance(name);
 });
-  global.db.serverInstances.push({ server:server,process:cp});
-  if(global.db.ramInUse==null){
-    global.db.ramInUse=0;
+  global.instancelock.serverInstances.push({ server:server,process:cp});
+  if(global.instancelock.ramInUse==null){
+    global.instancelock.ramInUse=0;
   }
-  global.db.ramInUse=parseInt(server.ram)+parseInt(global.db.ramInUse);
-  updateDB();
+  global.instancelock.ramInUse=parseInt(server.ram)+parseInt(global.instancelock.ramInUse);
+  updateInstanceLock();
   return 'started';
 }
 function initializeBackend(){
@@ -202,17 +219,19 @@ function initializeBackend(){
     fs.mkdirSync(resourcesLocation);
     fs.writeFileSync(resourcesLocation+`default_ops.json`, '[]');
     fs.writeFileSync(resourcesLocation+`default_eula.txt`, 'eula=true');
+  }
+  if(!fs.existsSync(dbLocation)){
     fs.writeFileSync(dbLocation,JSON.stringify({
-                   "username": "admin",
-                   "password": "password",
                    "ramCapacity": "8192",
                    "defaultRamAllocation": "2048",
                    "javaPath": "java",
-                   "servers": [],
-                   "serverInstances": [],
-                   "ramInUse": 0
-                 },null,1))
+                   "servers": []
+                 },null,1));
   }
+  if(!fs.existsSync(instanceLock)){
+    fs.writeFileSync(instanceLock,'{"ramInUse": 0,"serverInstances":[]}');
+  }
+
   if(!fs.existsSync(management)){
     fs.mkdirSync(management);
   }
@@ -226,6 +245,7 @@ function initializeBackend(){
   updatePluginsList();
 }
 exports.updateDatabase = updateDB;
+exports.updateInstanceLock = updateInstanceLock;
 exports.readDatabase=readDB;
 exports.updateJarList = updateJarList;
 exports.updatePluginsList = updatePluginsList;
@@ -239,3 +259,5 @@ exports.openWorld=openWorld;
 exports.removeRunningInstance=removeRunningInstance;
 exports.openSettings=openSettings;
 exports.openSystemFolder=openSystemFolder;
+exports.openJarsFolder=openJarsFolder;
+exports.openServerProvider=openServerProvider;
