@@ -29,6 +29,9 @@ function updateDB(){
   fs.writeFileSync(dbLocation, data);
 }
 function updateInstanceLock(){
+  if(global.instancelock.serverInstances.length==0){
+    global.instancelock.ramInUse=0;
+  }
   fs.writeFileSync(instanceLock, JSON.stringify(global.instancelock,null,1));
 }
 
